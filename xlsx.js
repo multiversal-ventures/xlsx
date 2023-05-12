@@ -477,11 +477,15 @@ function SSF_parse_date_code(v,opts,b2) {
 var SSFbasedate = new Date(1899, 11, 31, 0, 0, 0);
 var SSFdnthresh = SSFbasedate.getTime();
 var SSFbase1904 = new Date(1900, 2, 1, 0, 0, 0);
+var SSFmsInDay = 24 * 60 * 60 * 1000;
 function datenum_local(v, date1904) {
 	var epoch = v.getTime();
-	if(date1904) epoch -= 1461*24*60*60*1000;
-	else if(v >= SSFbase1904) epoch += 24*60*60*1000;
-	return (epoch - (SSFdnthresh + (v.getTimezoneOffset() - SSFbasedate.getTimezoneOffset()) * 60000)) / (24 * 60 * 60 * 1000);
+	var date = Math.floor(epoch / SSFmsInDay);
+	var time = epoch % SSFmsInDay;
+	if(time < 0) time += SSFmsInDay;
+	if(date1904) date -= 1461;
+	else if(v >= SSFbase1904) date += 1;
+	return (date - Math.floor(SSFdnthresh / SSFmsInDay)) + (time - v.getTimezoneOffset() * 60000) / SSFmsInDay;
 }
 /* ECMA-376 18.8.30 numFmt*/
 /* Note: `toPrecision` uses standard form when prec > E and E >= -6 */
@@ -3270,11 +3274,15 @@ function evert_arr(obj) {
 }
 
 var basedate = new Date(1899, 11, 30, 0, 0, 0); // 2209161600000
+var msInDay = 24 * 60 * 60 * 1000;
 function datenum(v, date1904) {
 	var epoch = v.getTime();
-	if(date1904) epoch -= 1462*24*60*60*1000;
-	var dnthresh = basedate.getTime() + (v.getTimezoneOffset() - basedate.getTimezoneOffset()) * 60000;
-	return (epoch - dnthresh) / (24 * 60 * 60 * 1000);
+	var date = Math.floor(epoch / msInDay);
+	var time = epoch % msInDay;
+	if(time < 0) time += msInDay;
+	if(date1904) date -= 1462;
+	var dnthresh = Math.floor(basedate.getTime() / msInDay);
+	return (date - dnthresh) + (time - v.getTimezoneOffset() * 60000) / msInDay;
 }
 var refdate = new Date();
 var dnthresh = basedate.getTime() + (refdate.getTimezoneOffset() - basedate.getTimezoneOffset()) * 60000;
