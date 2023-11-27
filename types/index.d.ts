@@ -19,21 +19,50 @@ export function set_fs(fs: any): void;
 /** Set internal codepage tables */
 export function set_cptable(cptable: any): void;
 
-/** NODE ONLY! Attempts to read filename and parse */
-export function readFile(filename: string, opts?: ParsingOptions): WorkBook;
-/** Attempts to parse data */
-export function read(data: any, opts?: ParsingOptions): WorkBook;
+/**
+ * Attempts to synchronously read and parse a file from its supplied file path.
+ *
+ * NOTE: This function is only supported in server-side environments that
+ * provide synchronous file-reading APIs (e.g. NodeJS)
+ */
+export function readFile(filePath: string, opts?: ParsingOptions): WorkBook;
+/**
+ * Attempts to parse the data supplied
+ *
+ * @param data the data to parse, in one of the following formats:
+ *
+ * - `"buffer"` (`Uint8Array` or NodeJS `Buffer`): binary data consisting of
+ * 8-bit unsigned integers
+ * - `"array"` (`ArrayBuffer`)
+ * - `"base64"` (`string`): Base64 encoding of the file
+ * - `"file"` (`string`): path of file that will be read (server-side
+ * environments only. See also {@link readFile}.)
+ * - `"string"` (`string`): JS string (only appropriate for UTF-8 text formats)
+ * - `"binary"` (`string`): binary string (byte `n` is `data.charCodeAt(n)`)
+ *
+ * Some common formats are automatically deduced from the data input type,
+ * including `Uint8Array` and `ArrayBuffer` objects and NodeJS `Buffer`
+ * objects. Alternatively, the format can be explicitly supplied as
+ * `opts.type`.
+ *
+ * When a string is passed with no `type`, the library assumes the data is a
+ * Base64 string. `FileReader#readAsBinaryString` or ASCII data requires
+ * "binary" type. DOM strings, including `FileReader#readAsText`, should use
+ * type "string".
+ */
+export function read(data: ArrayBuffer | Uint8Array | string, opts?: ParsingOptions): WorkBook;
 /** Attempts to write or download workbook data to file */
-export function writeFile(data: WorkBook, filename: string, opts?: WritingOptions): any;
+export function writeFile(data: WorkBook, filename: string, opts?: WritingOptions): void;
 /** Attempts to write or download workbook data to XLSX file */
-export function writeFileXLSX(data: WorkBook, filename: string, opts?: WritingOptions): any;
+export function writeFileXLSX(data: WorkBook, filename: string, opts?: WritingOptions): void;
 /** Attempts to write or download workbook data to file asynchronously */
 type CBFunc = () => void;
-export function writeFileAsync(filename: string, data: WorkBook, opts: WritingOptions | CBFunc, cb?: CBFunc): any;
+export function writeFileAsync(filename: string, data: WorkBook, opts: WritingOptions | CBFunc, cb?: CBFunc): void;
 /** Attempts to write the workbook data */
-export function write(data: WorkBook, opts: WritingOptions): any;
+export function write<T extends WritingOptionsType = WritingOptionsType>(data: WorkBook, opts: WritingOptions<T>):
+    T extends 'buffer' ? Uint8Array : T extends 'array' ? ArrayBuffer : string;
 /** Attempts to write the workbook data as XLSX */
-export function writeXLSX(data: WorkBook, opts: WritingOptions): any;
+export function writeXLSX(data: WorkBook, opts: WritingOptions): void;
 
 /** Utility Functions */
 export const utils: XLSX$Utils;
@@ -253,11 +282,12 @@ export interface ParsingOptions extends UTCOption, CommonOptions, DenseOption {
     PRN?: boolean;
 }
 
+type WritingOptionsType = 'base64' | 'binary' | 'buffer' | 'file' | 'array' | 'string';
 
 /** Options for write and writeFile */
-export interface WritingOptions extends CommonOptions {
+export interface WritingOptions<T extends WritingOptionsType = WritingOptionsType> extends CommonOptions {
     /** Output data encoding */
-    type?: 'base64' | 'binary' | 'buffer' | 'file' | 'array' | 'string';
+    type: T;
 
     /**
      * Generate Shared String Table
@@ -805,9 +835,11 @@ export interface Sheet2HTMLOpts {
     footer?: string;
 }
 
-export interface Sheet2JSONOpts extends DateNFOption {
+export type Sheet2JSONCellValue<DefaultVal = undefined> = string | number | boolean | DefaultVal;
+
+export interface Sheet2JSONOpts<DefaultVal = undefined> extends DateNFOption {
     /** Output format */
-    header?: "A"|number|string[];
+    header?: 'A' | 1 | readonly string[];
 
     /** Override worksheet range */
     range?: any;
@@ -816,7 +848,7 @@ export interface Sheet2JSONOpts extends DateNFOption {
     blankrows?: boolean;
 
     /** Default value for null/undefined values */
-    defval?: any;
+    defval?: DefaultVal;
 
     /** if true, return raw data; if false, return formatted text */
     raw?: boolean;
@@ -920,9 +952,12 @@ export interface XLSX$Utils {
     /* --- Export Functions --- */
 
     /** Converts a worksheet object to an array of JSON objects */
+    sheet_to_json<ColumnKey extends string, DefaultVal = undefined>(worksheet: WorkSheet, opts?: Sheet2JSONOpts<DefaultVal> & { header: readonly ColumnKey[] }): Record<ColumnKey, Sheet2JSONCellValue<DefaultVal>>[];
+    sheet_to_json<ColumnKey extends string, DefaultVal = undefined>(worksheet: WorkSheet, opts?: Sheet2JSONOpts<DefaultVal> & { header?: undefined }): Record<string, Sheet2JSONCellValue<DefaultVal>>[];
+    sheet_to_json<ColumnKey extends string, DefaultVal = undefined>(worksheet: WorkSheet, opts?: Sheet2JSONOpts<DefaultVal> & { header: 'A' }): Record<string, Sheet2JSONCellValue<DefaultVal>>[];
+    sheet_to_json<ColumnKey extends string, DefaultVal = undefined>(worksheet: WorkSheet, opts?: Sheet2JSONOpts<DefaultVal> & { header: 1 }): Sheet2JSONCellValue<DefaultVal>[][];
+    // ...or manually supply a row type
     sheet_to_json<T>(worksheet: WorkSheet, opts?: Sheet2JSONOpts): T[];
-    sheet_to_json(worksheet: WorkSheet, opts?: Sheet2JSONOpts): any[][];
-    sheet_to_json(worksheet: WorkSheet, opts?: Sheet2JSONOpts): any[];
 
     /** Generates delimiter-separated-values output */
     sheet_to_csv(worksheet: WorkSheet, options?: Sheet2CSVOpts): string;
