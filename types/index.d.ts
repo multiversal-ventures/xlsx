@@ -62,7 +62,8 @@ export function writeFileAsync(filename: string, data: WorkBook, opts: WritingOp
 export function write<T extends WritingOptionsType = WritingOptionsType>(data: WorkBook, opts: WritingOptions<T>):
     T extends 'buffer' ? Uint8Array : T extends 'array' ? ArrayBuffer : string;
 /** Attempts to write the workbook data as XLSX */
-export function writeXLSX(data: WorkBook, opts: WritingOptions): void;
+export function writeXLSX<T extends WritingOptionsType = WritingOptionsType>(data: WorkBook, opts: WritingOptions<T>):
+    T extends 'buffer' ? Uint8Array : T extends 'array' ? ArrayBuffer : string;
 
 /** Utility Functions */
 export const utils: XLSX$Utils;
@@ -282,7 +283,7 @@ export interface ParsingOptions extends UTCOption, CommonOptions, DenseOption {
     PRN?: boolean;
 }
 
-type WritingOptionsType = 'base64' | 'binary' | 'buffer' | 'file' | 'array' | 'string';
+export type WritingOptionsType = 'base64' | 'binary' | 'buffer' | 'file' | 'array' | 'string';
 
 /** Options for write and writeFile */
 export interface WritingOptions<T extends WritingOptionsType = WritingOptionsType> extends CommonOptions {
