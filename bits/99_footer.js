@@ -1,4 +1,4 @@
-}
+
 /*global define */
 /*:: declare var define:any; */
 if(typeof exports !== 'undefined') make_xlsx_lib(exports);
