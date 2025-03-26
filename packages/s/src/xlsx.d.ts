@@ -618,7 +618,7 @@ export interface Sheet2HTMLOpts {
 
 export interface Sheet2JSONOpts extends DateNFOption {
     /** Output format */
-    header?: "A"|number|string[];
+    header?: ReadonlyArray<"A"|number|string>;
 
     /** Override worksheet range */
     range?: any;
@@ -645,7 +645,7 @@ export interface SheetAOAOpts extends AOA2SheetOpts, OriginOption {}
 
 export interface JSON2SheetOpts extends CommonOptions, DateNFOption {
     /** Use specified column order */
-    header?: string[];
+    header?: ReadonlyArray<string>;
 
     /** Skip header row in generated sheet */
     skipHeader?: boolean;
@@ -672,12 +672,12 @@ export interface XLSX$Utils {
     /* --- Import Functions --- */
 
     /** Converts an array of arrays of JS data to a worksheet. */
-    aoa_to_sheet<T>(data: T[][], opts?: AOA2SheetOpts): WorkSheet;
-    aoa_to_sheet(data: any[][], opts?: AOA2SheetOpts): WorkSheet;
+    aoa_to_sheet<T>(data: ReadonlyArray<ReadonlyArray<T>>, opts?: AOA2SheetOpts): WorkSheet;
+    aoa_to_sheet(data: ReadonlyArray<ReadonlyArray<any>>, opts?: AOA2SheetOpts): WorkSheet;
 
     /** Converts an array of JS objects to a worksheet. */
-    json_to_sheet<T>(data: T[], opts?: JSON2SheetOpts): WorkSheet;
-    json_to_sheet(data: any[], opts?: JSON2SheetOpts): WorkSheet;
+    json_to_sheet<T>(data: ReadonlyArray<T>, opts?: JSON2SheetOpts): WorkSheet;
+    json_to_sheet(data: ReadonlyArray<any>, opts?: JSON2SheetOpts): WorkSheet;
 
     /** BROWSER ONLY! Converts a TABLE DOM element to a worksheet. */
     table_to_sheet(data: any,  opts?: Table2SheetOpts): WorkSheet;
@@ -768,12 +768,12 @@ export interface XLSX$Utils {
     sheet_set_array_formula(ws: WorkSheet, range: Range|string, formula: string): WorkSheet;
 
     /** Add an array of arrays of JS data to a worksheet */
-    sheet_add_aoa<T>(ws: WorkSheet, data: T[][], opts?: SheetAOAOpts): WorkSheet;
-    sheet_add_aoa(ws: WorkSheet, data: any[][], opts?: SheetAOAOpts): WorkSheet;
+    sheet_add_aoa<T>(ws: WorkSheet, data: ReadonlyArray<ReadonlyArray<T>>, opts?: SheetAOAOpts): WorkSheet;
+    sheet_add_aoa(ws: WorkSheet, data: ReadonlyArray<ReadonlyArray<any>>, opts?: SheetAOAOpts): WorkSheet;
 
     /** Add an array of JS objects to a worksheet */
-    sheet_add_json(ws: WorkSheet, data: any[], opts?: SheetJSONOpts): WorkSheet;
-    sheet_add_json<T>(ws: WorkSheet, data: T[], opts?: SheetJSONOpts): WorkSheet;
+    sheet_add_json(ws: WorkSheet, data: ReadonlyArray<any>, opts?: SheetJSONOpts): WorkSheet;
+    sheet_add_json<T>(ws: WorkSheet, data: ReadonlyArray<T>, opts?: SheetJSONOpts): WorkSheet;
 
 
     consts: XLSX$Consts;
