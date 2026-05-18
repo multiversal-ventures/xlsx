@@ -1,5 +1,5 @@
 {
-	"name": "xlsx",
+	"name": "@multiversal-ventures/xlsx",
 	"version": "0.20.3",
 	"author": "sheetjs",
 	"description": "SheetJS Spreadsheet data parser and writer",
@@ -109,8 +109,7 @@
 		"fs": false
 	},
 	"sideEffects": false,
-	"dependencies": {
-	},
+	"dependencies": {},
 	"devDependencies": {
 		"@sheetjs/uglify-js": "~2.7.3",
 		"@types/node": "^8.5.9",
@@ -139,7 +138,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://git.sheetjs.com/SheetJS/sheetjs"
+		"url": "https://github.com/multiversal-ventures/xlsx.git"
 	},
 	"scripts": {
 		"test": "make travis",
@@ -165,10 +164,22 @@
 	},
 	"homepage": "https://sheetjs.com/",
 	"files": [
-		"CHANGELOG.md", "LICENSE", "README.md", "bower.json", "package.json", "xlsx.js", "xlsx.mjs", "xlsxworker.js",
+		"CHANGELOG.md",
+		"LICENSE",
+		"README.md",
+		"bower.json",
+		"package.json",
+		"xlsx.js",
+		"xlsx.mjs",
+		"xlsxworker.js",
 		"bin/xlsx.njs",
-		"dist/LICENSE", "dist/*.mjs", "dist/*.js", "dist/*.map", "dist/*.d.ts",
-		"types/index.d.ts", "types/tsconfig.json"
+		"dist/LICENSE",
+		"dist/*.mjs",
+		"dist/*.js",
+		"dist/*.map",
+		"dist/*.d.ts",
+		"types/index.d.ts",
+		"types/tsconfig.json"
 	],
 	"bugs": {
 		"url": "https://git.sheetjs.com/SheetJS/sheetjs/issues"
@@ -176,5 +187,9 @@
 	"license": "Apache-2.0",
 	"engines": {
 		"node": ">=0.8"
+	},
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com",
+		"access": "public"
 	}
 }
